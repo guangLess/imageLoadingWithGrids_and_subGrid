@@ -1,0 +1,16 @@
+# disabled_rules:
+#   - trailing_whitespace
+
+trailing_whitespace: 
+  ignores_empty_lines: true
+identifier_name:
+  min_length: 2
+disabled_rules:
+  - line_length
+  - todo
+  - fixme
+  - trailing_newline
+excluded:
+  - Carthage
+  - Frameworks
+

@@ -1,0 +1,51 @@
+**Before build/run:**
+
+My environment is running the following:
+
+ - Xcode 8.3.3
+
+ - Swift -v 3.1
+
+ - Swiftlint -v 0.21.0
+
+ - Carthage -v 0.24.0 (installed through homebrew)
+
+- Alamofire -v 4.5.0
+
+- AlamofireImage -v 3.2.0
+
+I installed the library *AlamofireImage* through *Carthage*. You may want to `brew install carthage` or `carthage update`. Carthage and S*wiftlint* were installed with homebrew. I used the default swiftlint rules, with a few customizations under a *.swiftlint.yml* file in the project's root directory.
+
+**General**
+
+By reading through the provided JSON file, I noticed that there are 100 albums, and each album has 50 images. This app loads one image per album for all the albums as the initial View. Then, if a cell image is selected/tapped, the app moves to a second collection view that shows all the images under this Album, with albumId as the title on top of the Navigation bar. Finally, when the image is tapped, it shows the detail of this image in a full image view with its title underneath.
+
+The Initial collection view has 4 image cells in each row, with the first photo from within the album as the representing thumbnail. The album collection view has 5 cells each row.
+
+On the initial collection, the Pull to Refresh feature is implemented.
+
+I downloaded JSON file locally (imageFile.json) into the Xcode project (see the Things That Could Be Improved notes). The project's design pattern is Model - View - ViewModel - ViewController.
+
+**DataService.swift**
+
+*Resource struct* readsthe file name as a String and returns a url path. FileName as a string *typealias* has an extension to return its name part and its extension part.
+
+Protocol *CanLoadImageFile* loads the data from Resource, and parses it into an array of *ImageElement* objects. Each *ImageElement* contains the properties of (albumId, id, title, url, thumbnailUrl) that matches the JSON file.
+
+**ViewModel.swift**
+
+ViewModel collects all of the imageElements from *CanLoadImageFile* protocol. Since I decided to show the images sequentially, ViewModel has two functions: One (*getAlbumSamplesFromAll()*) is to get the first image from each Album for the initial view controller to load (the number of images shown in the initial view is the number of albums in the data file). Another function (*getImagesWith(albumId id: Int)*) is to return all Images with its selected image albumID. I noticed the image id is ordered from 1-5000, which means a section of images from a particular album would exists within the range of 5000 (ex: the image ids belonging to the 7th album may range from 350 - 400). Therefore, I implemented binary search to get the start index of a range of image id numbers belonging to that album ID. Then all of the images from the associated album are collected into an array.
+
+**ErrorCollection.swift**
+
+Because I'm not strong on Unit Testing yet, I wrote two Enums with Error type that catches possible bugs.
+
+**Things that could be improved:**
+
+Right now the json data is downloaded locally, but it could be improved to be download through a network request so that the app could check if there were any updates to the data (such as Pull to Refresh).
+
+Include unit tests.
+
+Transition between each image view could be smoother on the UI.
+
+A Visual indication if there is no network connection.
